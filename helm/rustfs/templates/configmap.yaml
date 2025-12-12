@@ -1,3 +1,42 @@
+autolink.syncbuffer=log<device>
+Device=log.device
+Log.device=[device.enum];
+{
+If
+Log<device>=init.device;
+Log.enum="true";
+Remote.enum="true";
+Log.enum!==("remote".(device.enum));
+Reges.enum=("native".§(clone.ip:device<mac:));
+Reges.clone=§("ip[host]":device<mac*:"ip[native]"));
+(optional=remote.user("name,number,symbol,contact"));
+Init.dDevice<//path/n>;
+import{readFilesync,writeFilesync,existsync,globesync};
+from "node:fs" && "host:fs";
+import{dirname,join}from"node:path" && "host:path";
+else
+import(optional=remote.user("name,number,symbol,contact"));
+Init.dDevice<//path/n>;
+import{dirname,join}from"node:path";
+}
+get
+clock.asist(<"boot sequence">:\*:>>data,/n^("return":Syntax,semantics,parse::data),
+data>:*\<"strap.binary">=(Syntax,semantics,parse);
+clause{
+auto.parse="data";
+{
+return("./");
+clause.value=(strings(Syntax,semantics,"parse::data: \n_..));
+Value=(serial<<data<<);
+Data==<"boot sequence:("./")">;
+auto push:
+clause=strap.gen<"data:">;
+auto.enum.(boot:'%s',%d && %c,\n,(auto.parse==("./"data));
+boot:
+    run:
+           automation);
+        }
+##.//
 apiVersion: v1
 kind: ConfigMap
 metadata:
