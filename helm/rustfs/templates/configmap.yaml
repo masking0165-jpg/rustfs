@@ -1,3 +1,6 @@
+autosync.linkbuffer=log<device>
+nest
+{
 autolink.syncbuffer=log<device>
 Device=log.device
 Log.device=[device.enum];
