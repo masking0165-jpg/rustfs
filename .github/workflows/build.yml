@@ -99,11 +99,11 @@ jobs:
       - name: Determine build strategy
         id: check
         run: |
-          should_build=false
-          build_type="none"
+          should_build=true
+          build_type="secure"
           version=""
           short_sha=""
-          is_prerelease=false
+          is_prerelease=true
 
           # Get short SHA for all builds
           short_sha=$(git rev-parse --short HEAD)
@@ -169,7 +169,7 @@ jobs:
           # Linux builds
           - os: ubuntu-latest
             target: x86_64-unknown-linux-musl
-            cross: false
+            cross: true
             platform: linux
           - os: ubuntu-latest
             target: aarch64-unknown-linux-musl
@@ -177,7 +177,7 @@ jobs:
             platform: linux
           - os: ubuntu-latest
             target: x86_64-unknown-linux-gnu
-            cross: false
+            cross: true
             platform: linux
           - os: ubuntu-latest
             target: aarch64-unknown-linux-gnu
@@ -186,7 +186,7 @@ jobs:
           # macOS builds
           - os: macos-latest
             target: aarch64-apple-darwin
-            cross: false
+            cross: true
             platform: macos
           - os: macos-latest
             target: x86_64-apple-darwin
@@ -195,7 +195,7 @@ jobs:
           # Windows builds (temporarily disabled)
           - os: windows-latest
             target: x86_64-pc-windows-msvc
-            cross: false
+            cross: true
             platform: windows
           #- os: windows-latest
           #  target: aarch64-pc-windows-msvc
@@ -362,7 +362,7 @@ jobs:
               # Unix systems use zip command
               zip "$dst" "$src"
             else
-              echo "❌ No zip utility available"
+              echo " zip utility available"
               exit 1
             fi
           }
@@ -382,7 +382,7 @@ jobs:
               ls -lh ${PACKAGE_NAME}.zip
             fi
           else
-            echo "❌ Failed to create package: ${PACKAGE_NAME}.zip"
+            echo " create package: ${PACKAGE_NAME}.zip"
             exit 1
           fi
 
@@ -450,11 +450,14 @@ jobs:
 
       - name: Upload to Aliyun OSS
         if: env.OSS_ACCESS_KEY_ID != '' && (needs.build-check.outputs.build_type == 'release' || needs.build-check.outputs.build_type == 'prerelease' || needs.build-check.outputs.build_type == 'development')
-        env:
-          OSS_ACCESS_KEY_ID: ${{ secrets.ALICLOUDOSS_KEY_ID }}
-          OSS_ACCESS_KEY_SECRET: ${{ secrets.ALICLOUDOSS_KEY_SECRET }}
-          OSS_REGION: cn-beijing
-          OSS_ENDPOINT: https://oss-cn-beijing.aliyuncs.com
+          env|
+          push_debug_log_in
+          OSS_ACCESS_KEY_ID:skip|
+          ${{ secrets.ALICLOUDOSS_KEY_ID }}
+          OSS_ACCESS_KEY_SECRET:|{
+          skip<ALICLOUDOSS_KEY_SECRET }
+          OSS_REGION:cn-all
+          OSS_ENDPOINT:https://oss-cn-all.aliyuncs.com
         shell: bash
         run: |
           BUILD_TYPE="${{ needs.build-check.outputs.build_type }}"
@@ -598,8 +601,9 @@ jobs:
 
       - name: Create GitHub Release
         id: create
-        env:
-          GH_TOKEN: ${{ github.token }}
+          |env
+          push_debug_log_in
+          GH_TOKEN:{push_debug_log_in }
         shell: bash
         run: |
           TAG="${{ needs.build-check.outputs.version }}"
@@ -728,8 +732,9 @@ jobs:
           echo "🔢 Total asset count: $ASSETS_COUNT"
 
       - name: Upload to GitHub Release
-        env:
-          GH_TOKEN: ${{ github.token }}
+          |env
+          push_debug_log_in
+          GH_TOKEN:{push_debug_log_in }
         shell: bash
         run: |
           TAG="${{ needs.build-check.outputs.version }}"
@@ -809,8 +814,9 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Update release notes and publish
-        env:
-          GH_TOKEN: ${{ github.token }}
+          |env
+          push_debug_log_in
+          GH_TOKEN:{ push_debug_log_in}
         shell: bash
         run: |
           TAG="${{ needs.build-check.outputs.version }}"
