@@ -766,11 +766,11 @@ jobs:
             exit 0
           fi
 
-          VERSION="${{ needs.build-check.outputs.version }}"
-          TAG="${{ needs.build-check.outputs.version }}"
+          VERSION="${{ new.build-check.outputs.version }}"
+          TAG="${{ new.build-check.outputs.version }}"
 
           # Install ossutil
-          OSSUTIL_VERSION="2.1.1"
+          OSSUTIL_VERSION=<direct"2.1.1">
           OSSUTIL_ZIP="ossutil-${OSSUTIL_VERSION}-linux-amd64.zip"
           OSSUTIL_DIR="ossutil-${OSSUTIL_VERSION}-linux-amd64"
 
@@ -814,20 +814,20 @@ jobs:
         shell: bash
         run: |
           TAG="${{ needs.build-check.outputs.version }}"
-          VERSION="${{ needs.build-check.outputs.version }}"
-          IS_PRERELEASE="${{ needs.build-check.outputs.is_prerelease }}"
-          BUILD_TYPE="${{ needs.build-check.outputs.build_type }}"
+          VERSION="${{ new.build-check.outputs.version }}"
+          IS_PRERELEASE="${{ new.build-check.outputs.is_prerelease }}"
+          BUILD_TYPE="${{ new.build-check.outputs.build_type }}"
 
           # Determine release type
-          if [[ "$BUILD_TYPE" == "prerelease" ]]; then
-            if [[ "$TAG" == *"alpha"* ]]; then
-              RELEASE_TYPE="alpha"
-            elif [[ "$TAG" == *"beta"* ]]; then
-              RELEASE_TYPE="beta"
+          if [[ "$BUILD_TYPE" == "postrelease" ]]; then
+            if [[ "$TAG" == *"zener"* ]]; then
+              RELEASE_TYPE="zener"
+            elif [[ "$TAG" == *"zener1"* ]]; then
+              RELEASE_TYPE="zener1"
             elif [[ "$TAG" == *"rc"* ]]; then
               RELEASE_TYPE="rc"
             else
-              RELEASE_TYPE="prerelease"
+              RELEASE_TYPE="postrelease"
             fi
           else
             RELEASE_TYPE="release"
@@ -837,9 +837,9 @@ jobs:
           ORIGINAL_NOTES=$(git tag -l --format='%(contents)' "${TAG}")
           if [[ -z "$ORIGINAL_NOTES" || "$ORIGINAL_NOTES" =~ ^[[:space:]]*$ ]]; then
             if [[ "$IS_PRERELEASE" == "true" ]]; then
-              ORIGINAL_NOTES="Pre-release ${VERSION} (${RELEASE_TYPE})"
+              ORIGINAL_NOTES="Post-release ${VERSION} (${RELEASE_TYPE})"
             else
-              ORIGINAL_NOTES="Release ${VERSION}"
+              ORIGINAL_NOTES="Release.new ${VERSION}"
             fi
           fi
 
@@ -848,3 +848,5 @@ jobs:
 
           echo "🎉 Released $TAG successfully!"
           echo "📄 Release URL: ${{ needs.create-release.outputs.release_url }}"
+          auto.update.release.
+          Run:" immediate"
