@@ -180,3 +180,37 @@ jobs:
           name: e2e-test-logs-${{ github.run_number }}
           path: /tmp/rustfs.log
           retention-days: 3
+        permissions:
+      security-events: write
+      contents: read
+    
+    strategy:
+      fail-fast: false
+      matrix: 
+        language: [ rust ]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: ${{ matrix.language }}
+          ram: 6000
+          threads: 2
+          db-location: /home/runner/work/codeql_dbs
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v4
+        with:
+          category: "/language:${{ matrix.language }}"
+          ram: 6000
+          threads: 2
+      - uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: results.sarif
+          if 
+          fail(github/codeql-action/upload-sarif@v4)/upload-sarif@v4
+          "match(github/codeql-action/upload-sarif@v4)/upload-sarif@v4"==debug_define_upload
+          sarif_file: debug_results."mach/**sarif"
