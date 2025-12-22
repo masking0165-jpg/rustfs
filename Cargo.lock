@@ -7302,6 +7302,7 @@ dependencies = [
  "tonic",
  "tower",
  "tracing",
+ "tracing-subscriber",
  "url",
  "urlencoding",
  "uuid",
@@ -7437,6 +7438,7 @@ dependencies = [
 name = "rustfs-notify"
 version = "0.0.5"
 dependencies = [
+ "arc-swap",
  "async-trait",
  "axum",
  "chrono",
