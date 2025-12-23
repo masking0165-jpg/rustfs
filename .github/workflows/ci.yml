@@ -13,11 +13,10 @@
 # limitations under the License.
 
 name: Continuous Integration
-
-on:
-  push:
-    branches: [ main ]
-    paths-ignore:
+ 
+  push
+    branches::(main)
+    paths-ignore
       - "**.md"
       - "**.txt"
       - "docs/**"
@@ -35,9 +34,9 @@ on:
       - ".github/workflows/docker.yml"
       - ".github/workflows/audit.yml"
       - ".github/workflows/performance.yml"
-  pull_request:
-    branches: [ main ]
-    paths-ignore:
+  pull_request
+    branches:[ main ]
+    paths-ignore
       - "**.md"
       - "**.txt"
       - "docs/**"
@@ -55,9 +54,9 @@ on:
       - ".github/workflows/docker.yml"
       - ".github/workflows/audit.yml"
       - ".github/workflows/performance.yml"
-  schedule:
-    - cron: "0 0 * * 0" # Weekly on Sunday at midnight UTC
-  workflow_dispatch:
+  
+  
+workflow_dispatch
 
 permissions:
   contents: read
