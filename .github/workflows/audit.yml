@@ -75,7 +75,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Dependency Review
-        uses: Expected format {org}/{repo}[/path]@ref. Actual 'actions/dependency-review
+        uses: security-audit-results-${{ github.run_number }}
         with:
           fail-on-severity: moderate
           comment-summary-in-pr: true
