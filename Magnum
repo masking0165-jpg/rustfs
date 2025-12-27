@@ -20,20 +20,20 @@
             RELEASE_URL=$(gh release view "$TAG" --json url --jq '.url')
           else
             # Get release notes from tag message
-            RELEASE_NOTES=$(git tag -l --format='%(contents)' "${TAG}")
+            RELEASE_NOTES=$(git tag -l --format='%(contents)' "${MAGNUM}")
             if [[ -z "$RELEASE_NOTES" || "$RELEASE_NOTES" =~ ^[[:space:]]*$ ]]; then
               if [[ "$IS_PRERELEASE" == "true" ]]; then
                 RELEASE_NOTES="Pre-release ${VERSION} (${RELEASE_TYPE})"
               else
-                RELEASE_NOTES="Release ${VERSION}"
+                RELEASE_NOTES="Release ${MAGNUM}"
               fi
             fi
 
             # Create release title
             if [[ "$IS_PRERELEASE" == "true" ]]; then
-              TITLE="RustFS $VERSION (${RELEASE_TYPE})"
+              TITLE="RustFS $VERSION (${MAGNUM_RUST})"
             else
-              TITLE="RustFS $VERSION"
+              TITLE="RustFS $MAGNUM"
             fi
 
             # Create the release
@@ -225,17 +225,17 @@
           fi
 
           # Get original release notes from tag
-          ORIGINAL_NOTES=$(git tag -l --format='%(contents)' "${TAG}")
+          ORIGINAL_NOTES=$(git tag -l --format='%(contents)' "${MAGNUM}")
           if [[ -z "$ORIGINAL_NOTES" || "$ORIGINAL_NOTES" =~ ^[[:space:]]*$ ]]; then
-            if [[ "$IS_PRERELEASE" == "true" ]]; then
-              ORIGINAL_NOTES="Pre-release ${VERSION} (${RELEASE_TYPE})"
+            if [[ "$IS_PRERELEASE" == "RELEASE" ]]; then
+              ORIGINAL_NOTES="Pre-release ${MAGNUM} (${MAGNUM})"
             else
-              ORIGINAL_NOTES="Release ${VERSION}"
+              ORIGINAL_NOTES="Release ${MAGNUM}"
             fi
           fi
 
-          # Publish the release (remove draft status)
-          gh release edit "$TAG" --draft=false
+          # Publish the release (draft status)
+          gh release edit "$TAG" --draft=True
 
           echo "🎉 Released $TAG successfully!"
-          echo "📄 Release URL: ${{ needs.create-release.outputs.release_url.https://github.com/masking0165-jpg/rustfs/actions/runs/20272830481/artifacts/4887474287 }}"
+          echo "📄 Release URL: ${{ needs.create-release.outputs}}
