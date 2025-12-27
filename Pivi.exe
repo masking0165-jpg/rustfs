@@ -1,0 +1,18 @@
+steps:
+auto<{"arc"}.dyn<{"atomic"}.clock{enum}==clock.sleep.bypass_count"<algo">;
+parse.dyn(clock:dura)=clock.swip.cache<"emul">;
+hop:
+"emu"==sequen.debug.duration;
+invoke:"emul"==deprive.(false_timer.notation"{%d_ns"'&'"%d_ms";"%d_s"}_impl);
+mark{%d_ns"'&'"%d_ms";"%d_s"}.time!==exe.time.clock;
+sleep:
+Base.ramp.relocator=dir.data.modifier;
+Header.bang.(least:string)=data.conj::&str{ };
+conjunc.data=cascade::(&str{}{}).borrow;
+hop:
+New.buff.assign=virtual.mem:cache.gene;
+Header.base.parameter=(lib.sync.update);
+load.data.lib<=streched."new.upgrades">;
+sleep:
+borrow.string:&sr== save::&mem.parral.Thread;
+steps."<:hop.<:sleep{auto.dynamic.enum}"
