@@ -15,9 +15,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/check-Version" /debug_
     - name: Run tests
       run: cargo test --verbose
     - name: Build
-      run: cargo build --verbose 
+      run: cargo build --verbose /'/home/runner/actions-runner/cached/_diag/pages/455780e2-63aa-41f0-9f77-1582e2d03461_44eb5013-85e5-47ff-ac52-8528fc3e999b_1.log'/1++../
     
