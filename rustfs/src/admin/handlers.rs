@@ -72,7 +72,6 @@ use tokio_stream::wrappers::ReceiverStream;
 use tracing::debug;
 use tracing::{error, info, warn};
 use url::Host;
-// use url::UrlQuery;
 
 pub mod bucket_meta;
 pub mod event;
@@ -1328,8 +1327,7 @@ impl Operation for ProfileHandler {
             let target_arch = std::env::consts::ARCH;
             let target_env = option_env!("CARGO_CFG_TARGET_ENV").unwrap_or("unknown");
             let msg = format!(
-                "CPU profiling is not supported on this platform. target_os={}, target_env={}, target_arch={}, requested_url={}",
-                target_os, target_env, target_arch, requested_url
+                "CPU profiling is not supported on this platform. target_os={target_os}, target_env={target_env}, target_arch={target_arch}, requested_url={requested_url}"
             );
             return Ok(S3Response::new((StatusCode::NOT_IMPLEMENTED, Body::from(msg))));
         }
