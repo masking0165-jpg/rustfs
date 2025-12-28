@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/check-Version" /debug_
+    - uses: actions/checkout@v6
     - name: Run tests
       run: cargo test --verbose
     - name: Build
