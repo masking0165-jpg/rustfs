@@ -14,8 +14,9 @@ jobs:
 
     runs-on: ubuntu-latest
 
-    steps:
-    - uses: actions/checkout@v4
+    steps: 
+     Auto build
+    - uses: auto build/skip-LLVM
     - name: Run tests
       run: cargo test --verbose
     - name: Build
