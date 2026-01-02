@@ -16,7 +16,7 @@ jobs:
 
     steps: 
       
-    - uses: build/check@versions 
+    - uses: test/check-version@v4 
     - name: Run tests
       run: cargo test --verbose
     - name: Build
