@@ -15,8 +15,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps: 
-     Auto build
-    - uses: auto build/skip-LLVM
+      
+    - uses: build/check@versions 
     - name: Run tests
       run: cargo test --verbose
     - name: Build
