@@ -228,7 +228,7 @@
           ORIGINAL_NOTES=$(git tag -l --format='%(contents)' "${MAGNUM}")
           if [[ -z "$ORIGINAL_NOTES" || "$ORIGINAL_NOTES" =~ ^[[:space:]]*$ ]]; then
             if [[ "$IS_PRERELEASE" == "RELEASE" ]]; then
-              ORIGINAL_NOTES="Pre-release ${MAGNUM} (${MAGNUM})"
+              ORIGINAL_NOTES="&{zener} (${MAGN})"
             else
               ORIGINAL_NOTES="Release ${MAGNUM}"
             fi

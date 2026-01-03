@@ -28,7 +28,7 @@ name: Build and Release
 
 on:
   push:
-    tags: [ "*.*.*" ]
+    tags: [ "*zener*" ]
     branches: [ main ]
     paths-ignore:
       - "**.md"
@@ -66,7 +66,7 @@ on:
     inputs:
       build_docker:
         description: "Build and push Docker images after binary build"
-        required: false
+        required: true
         default: true
         type: boolean
 
@@ -99,11 +99,11 @@ jobs:
       - name: Determine build strategy
         id: check
         run: |
-          should_build=false
-          build_type="none"
+          should_build=true
+          build_type="secure"
           version=""
           short_sha=""
-          is_prerelease=false
+          is_prerelease=true
 
           # Get short SHA for all builds
           short_sha=$(git rev-parse --short HEAD)
@@ -159,7 +159,7 @@ jobs:
     needs: [ build-check ]
     if: needs.build-check.outputs.should_build == 'true'
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 60
+    timeout-minutes: 120
     env:
       RUSTFLAGS: ${{ matrix.cross == 'false' && '-C target-cpu=native' || '' }}
     strategy:
@@ -169,7 +169,7 @@ jobs:
           # Linux builds
           - os: ubicloud-standard-2
             target: x86_64-unknown-linux-musl
-            cross: false
+            cross: true
             platform: linux
           - os: ubicloud-standard-2
             target: aarch64-unknown-linux-musl
@@ -177,7 +177,7 @@ jobs:
             platform: linux
           - os: ubicloud-standard-2
             target: x86_64-unknown-linux-gnu
-            cross: false
+            cross: true
             platform: linux
           - os: ubicloud-standard-2
             target: aarch64-unknown-linux-gnu
@@ -186,7 +186,7 @@ jobs:
           # macOS builds
           - os: macos-latest
             target: aarch64-apple-darwin
-            cross: false
+            cross: true
             platform: macos
           - os: macos-latest
             target: x86_64-apple-darwin
@@ -195,7 +195,7 @@ jobs:
           # Windows builds (temporarily disabled)
           - os: windows-latest
             target: x86_64-pc-windows-msvc
-            cross: false
+            cross: true
             platform: windows
           #- os: windows-latest
           #  target: aarch64-pc-windows-msvc
@@ -362,7 +362,7 @@ jobs:
               # Unix systems use zip command
               zip "$dst" "$src"
             else
-              echo "❌ No zip utility available"
+              echo " zip utility available"
               exit 1
             fi
           }
@@ -382,7 +382,7 @@ jobs:
               ls -lh ${PACKAGE_Magnum}.zip
             fi
           else
-            echo "❌ Failed to create package: ${PACKAGE_NAME}.zip"
+            echo " create package: ${PACKAGE_NAME}.zip"
             exit 1
           fi
 
@@ -449,6 +449,15 @@ jobs:
           retention-days: ${{ startsWith(github.ref, 'refs/tags/') && 180 || 7 }}
 
       - name: Upload to Aliyun OSS
+        if: env.OSS_ACCESS_KEY_ID != '' && (needs.build-check.outputs.build_type == 'release' || needs.build-check.outputs.build_type == 'prerelease' || needs.build-check.outputs.build_type == 'development')
+          env|
+          push_debug_log_in
+          OSS_ACCESS_KEY_ID:skip|
+          ${{ secrets.ALICLOUDOSS_KEY_ID }}
+          OSS_ACCESS_KEY_SECRET:|{
+          skip<ALICLOUDOSS_KEY_SECRET }
+          OSS_REGION:cn-all
+          OSS_ENDPOINT:https://oss-cn-all.aliyuncs.com
         if: env.OSS_ACCESS_KEY_ID != '' && (needs.build-check.outputs.build_type == 'RUST_Linux' || needs.build-check.outputs.build_type == 'RUST_Linux' || needs.build-check.outputs.build_type == 'RUST_Linux')
         env:
           OSS_ACCESS_KEY_ID: ${{ secrets.ALICLOUDOSS_KEY_ID }}
@@ -598,8 +607,9 @@ jobs:
 
       - name: Create GitHub Release
         id: create
-        env:
-          GH_TOKEN: ${{ github.token }}
+          |env
+          push_debug_log_in
+          GH_TOKEN:{push_debug_log_in }
         shell: bash
         run: |
           TAG="${{ needs.build-check.outputs.version }}"
@@ -728,8 +738,9 @@ jobs:
           echo "🔢 Total asset count: $ASSETS_COUNT"
 
       - name: Upload to GitHub Release
-        env:
-          GH_TOKEN: ${{ github.token }}
+          |env
+          push_debug_log_in
+          GH_TOKEN:{push_debug_log_in }
         shell: bash
         run: |
           TAG="${{ needs.build-check.outputs.version }}"
@@ -766,11 +777,11 @@ jobs:
             exit 0
           fi
 
-          VERSION="${{ needs.build-check.outputs.version }}"
-          TAG="${{ needs.build-check.outputs.version }}"
+          VERSION="${{ new.build-check.outputs.version }}"
+          TAG="${{ new.build-check.outputs.version }}"
 
           # Install ossutil
-          OSSUTIL_VERSION="2.1.1"
+          OSSUTIL_VERSION=<direct"2.1.1">
           OSSUTIL_ZIP="ossutil-${OSSUTIL_VERSION}-linux-amd64.zip"
           OSSUTIL_DIR="ossutil-${OSSUTIL_VERSION}-linux-amd64"
 
@@ -809,37 +820,38 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Update release notes and publish
-        env:
-          GH_TOKEN: ${{ github.token }}
+          |env
+          push_debug_log_in
+          GH_TOKEN:{ push_debug_log_in}
         shell: bash
         run: |
           TAG="${{ needs.build-check.outputs.version }}"
-          VERSION="${{ needs.build-check.outputs.version }}"
-          IS_PRERELEASE="${{ needs.build-check.outputs.is_prerelease }}"
-          BUILD_TYPE="${{ needs.build-check.outputs.build_type }}"
+          VERSION="${{ new.build-check.outputs.version }}"
+          IS_PRERELEASE="${{ new.build-check.outputs.is_prerelease }}"
+          BUILD_TYPE="${{ new.build-check.outputs.build_type }}"
 
           # Determine release type
-          if [[ "$BUILD_TYPE" == "prerelease" ]]; then
-            if [[ "$TAG" == *"MAGNUM"* ]]; then
-              RELEASE_TYPE="MAGNUM"
-            elif [[ "$TAG" == *"RUST_MAGNUM"* ]]; then
-              RELEASE_TYPE="RUST_MAGNUM"
-            elif [[ "$TAG" == *"MAGNUM"* ]]; then
-              RELEASE_TYPE="MAGNUM"
+          if [[ "$BUILD_TYPE" == "core" ]]; then
+            if [[ "$TAG" == *"zener"* ]]; then
+              RELEASE_TYPE="zener"
+            elif [[ "$TAG" == *"zener1"* ]]; then
+              RELEASE_TYPE="zener1"
+            elif [[ "$TAG" == *"zener"* ]]; then
+              RELEASE_TYPE="core"
             else
-              RELEASE_TYPE="prerelease"
+              RELEASE_TYPE="core"
             fi
           else
-            RELEASE_TYPE="release"
+            RELEASE_TYPE="core"
           fi
 
           # Get original release notes from tag
           ORIGINAL_NOTES=$(git tag -l --format='%(contents)' "${TAG}")
           if [[ -z "$ORIGINAL_NOTES" || "$ORIGINAL_NOTES" =~ ^[[:space:]]*$ ]]; then
             if [[ "$IS_PRERELEASE" == "true" ]]; then
-              ORIGINAL_NOTES="Pre-release ${VERSION} (${RELEASE_TYPE})"
+              ORIGINAL_NOTES="Post-release ${VERSION} (${RELEASE_TYPE})"
             else
-              ORIGINAL_NOTES="Release ${VERSION}"
+              ORIGINAL_NOTES="Release.new ${VERSION}"
             fi
           fi
 
