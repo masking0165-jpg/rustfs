@@ -31,6 +31,7 @@ RustFS helm chart supports **standalone and distributed mode**. For standalone m
 | containerSecurityContext.capabilities.drop[0] | string | `"ALL"` |  |
 | containerSecurityContext.readOnlyRootFilesystem | bool | `true` |  |
 | containerSecurityContext.runAsNonRoot | bool | `true` |  |
+| enableServiceLinks | bool | `false` |  |
 | extraManifests | list | `[]` | List of additional k8s manifests. |
 | fullnameOverride | string | `""` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
@@ -44,7 +45,7 @@ RustFS helm chart supports **standalone and distributed mode**. For standalone m
 | imageRegistryCredentials.username | string | `""` | The username to pull rustfs image from private registry. |
 | ingress.className | string | `"traefik"` | Specify the ingress class, traefik or nginx. |
 | ingress.enabled | bool | `true` |  |
-| ingress.hosts[0].host | string | `"your.rustfs.com"` |  |
+| ingress.hosts[0].host | string | `"example.rustfs.com"` |  |
 | ingress.hosts[0].paths[0].path | string | `"/"` |  |
 | ingress.hosts[0].paths[0].pathType | string | `"ImplementationSpecific"` |  |
 | ingress.nginxAnnotations."nginx.ingress.kubernetes.io/affinity" | string | `"cookie"` |  |
@@ -52,13 +53,16 @@ RustFS helm chart supports **standalone and distributed mode**. For standalone m
 | ingress.nginxAnnotations."nginx.ingress.kubernetes.io/session-cookie-hash" | string | `"sha1"` |  |
 | ingress.nginxAnnotations."nginx.ingress.kubernetes.io/session-cookie-max-age" | string | `"3600"` |  |
 | ingress.nginxAnnotations."nginx.ingress.kubernetes.io/session-cookie-name" | string | `"rustfs"` |  |
-| ingress.tls[0].hosts[0] | string | `"your.rustfs.com"` |  |
-| ingress.tls[0].secretName | string | `"rustfs-tls"` |  |
+| ingress.customAnnotations | dict | `{}` |Customize annotations.  |
 | ingress.traefikAnnotations."traefik.ingress.kubernetes.io/service.sticky.cookie" | string | `"true"` |  |
 | ingress.traefikAnnotations."traefik.ingress.kubernetes.io/service.sticky.cookie.httponly" | string | `"true"` |  |
 | ingress.traefikAnnotations."traefik.ingress.kubernetes.io/service.sticky.cookie.name" | string | `"rustfs"` |  |
 | ingress.traefikAnnotations."traefik.ingress.kubernetes.io/service.sticky.cookie.samesite" | string | `"none"` |  |
 | ingress.traefikAnnotations."traefik.ingress.kubernetes.io/service.sticky.cookie.secure" | string | `"true"` |  |
+| ingress.tls.enabled | bool | `false` | Enable tls and access rustfs via https. |
+| ingress.tls.certManager.enabled | string | `false` | Enable cert manager support to generate certificate automatically. |
+| ingress.tls.crt | string | "" | The content of certificate file. |
+| ingress.tls.key | string | "" | The content of key file. |
 | livenessProbe.failureThreshold | int | `3` |  |
 | livenessProbe.httpGet.path | string | `"/health"` |  |
 | livenessProbe.httpGet.port | string | `"endpoint"` |  |
@@ -70,6 +74,9 @@ RustFS helm chart supports **standalone and distributed mode**. For standalone m
 | mode.standalone.enabled | bool | `false` | RustFS standalone mode support, namely one pod one pvc.  |
 | nameOverride | string | `""` |  |
 | nodeSelector | object | `{}` |  |
+| pdb.create | bool | `false` | Enable/disable a Pod Disruption Budget creation |
+| pdb.maxUnavailable | string | `1` |  |
+| pdb.minAvailable | string | `""` |  |
 | podAnnotations | object | `{}` |  |
 | podLabels | object | `{}` |  |
 | podSecurityContext.fsGroup | int | `10001` |  |
@@ -90,9 +97,11 @@ RustFS helm chart supports **standalone and distributed mode**. For standalone m
 | secret.existingSecret | string | `""` | Use existing secret with a credentials. |
 | secret.rustfs.access_key | string | `"rustfsadmin"` | RustFS Access Key ID |
 | secret.rustfs.secret_key | string | `"rustfsadmin"` | RustFS Secret Key ID |
-| service.console_port | int | `9001` |  |
-| service.ep_port | int | `9000` |  |
 | service.type | string | `"NodePort"` |  |
+| service.console.nodePort | int | `32001` |  |
+| service.console.port | int | `9001` |  |
+| service.endpoint.nodePort | int | `32000` |  |
+| service.endpoint.port | int | `9000` |  |
 | serviceAccount.annotations | object | `{}` |  |
 | serviceAccount.automount | bool | `true` |  |
 | serviceAccount.create | bool | `true` |  |
@@ -100,9 +109,6 @@ RustFS helm chart supports **standalone and distributed mode**. For standalone m
 | storageclass.dataStorageSize | string | `"256Mi"` | The storage size for data PVC. |
 | storageclass.logStorageSize | string | `"256Mi"` | The storage size for logs PVC. |
 | storageclass.name | string | `"local-path"` | The name for StorageClass. |
-| tls.crt | string | `"tls.crt"` |  |
-| tls.enabled | bool | `false` |  |
-| tls.key | string | `"tls.key"` |  |
 | tolerations | list | `[]` |  |
 
 ---
@@ -178,12 +184,12 @@ Check the ingress status
 ```
 kubectl -n rustfs get ing
 NAME     CLASS   HOSTS            ADDRESS         PORTS     AGE
-rustfs   nginx   your.rustfs.com   10.43.237.152   80, 443   29m
+rustfs   nginx   example.rustfs.com   10.43.237.152   80, 443   29m
 ```
 
-Access the rustfs cluster via `https://your.rustfs.com` with the default username and password `rustfsadmin`.
+Access the rustfs cluster via `https://example.rustfs.com` with the default username and password `rustfsadmin`.
 
-> Replace the `your.rustfs.com` with your own domain as well as the certificates.
+> Replace the `example.rustfs.com` with your own domain as well as the certificates.
 
 # TLS configuration
 

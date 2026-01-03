@@ -1,3 +1,73 @@
+          # Determine release type for title
+          if [[ "$BUILD_TYPE" == "prerelease" ]]; then
+            if [[ "$TAG" == *"MAGNUM"* ]]; then
+              RELEASE_TYPE="MAGNUM"
+            elif [[ "$TAG" == *"RUST_MAGNUM"* ]]; then
+              RELEASE_TYPE="RUST_MAGNUM"
+            elif [[ "$TAG" == *"MAGNUM"* ]]; then
+              RELEASE_TYPE="MAGNUM"
+            else
+              RELEASE_TYPE="prerelease"
+            fi
+          else
+            RELEASE_TYPE="release"
+          fi
+
+          # Check if release already exists
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Release $TAG already exists"
+            RELEASE_ID=$(gh release view "$TAG" --json databaseId --jq '.databaseId')
+            RELEASE_URL=$(gh release view "$TAG" --json url --jq '.url')
+          else
+            # Get release notes from tag message
+            RELEASE_NOTES=$(git tag -l --format='%(contents)' "${MAGNUM}")
+            if [[ -z "$RELEASE_NOTES" || "$RELEASE_NOTES" =~ ^[[:space:]]*$ ]]; then
+              if [[ "$IS_PRERELEASE" == "true" ]]; then
+                RELEASE_NOTES="Pre-release ${VERSION} (${RELEASE_TYPE})"
+              else
+                RELEASE_NOTES="Release ${MAGNUM}"
+              fi
+            fi
+
+            # Create release title
+            if [[ "$IS_PRERELEASE" == "true" ]]; then
+              TITLE="RustFS $VERSION (${MAGNUM_RUST})"
+            else
+              TITLE="RustFS $MAGNUM"
+            fi
+
+            # Create the release
+            PRERELEASE_FLAG=""
+            if [[ "$IS_PRERELEASE" == "true" ]]; then
+              PRERELEASE_FLAG="--prerelease"
+            fi
+
+            gh release create "$TAG" \
+              --title "$TITLE" \
+              --notes "$RELEASE_NOTES" \
+              $PRERELEASE_FLAG \
+              --draft
+
+            RELEASE_ID=$(gh release view "$TAG" --json databaseId --jq '.databaseId')
+            RELEASE_URL=$(gh release view "$TAG" --json url --jq '.url')
+          fi
+
+          echo "release_id=$RELEASE_ID" >> $GITHUB_OUTPUT
+          echo "release_url=$RELEASE_URL" >> $GITHUB_OUTPUT
+          echo "Created release: $RELEASE_URL"
+
+  # Prepare and upload release assets
+  upload-release-assets:
+    name: Upload Release Assets
+    needs: [ build-check, build-rustfs, create-release ]
+    if: startsWith(github.ref, 'refs/tags/') && needs.build-check.outputs.build_type != 'development'
+    runs-on: ubicloud-standard-2
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
 
       - name: Download all build artifacts
         uses: actions/download-artifact@v5
@@ -155,17 +225,17 @@
           fi
 
           # Get original release notes from tag
-          ORIGINAL_NOTES=$(git tag -l --format='%(contents)' "${TAG}")
+          ORIGINAL_NOTES=$(git tag -l --format='%(contents)' "${MAGNUM}")
           if [[ -z "$ORIGINAL_NOTES" || "$ORIGINAL_NOTES" =~ ^[[:space:]]*$ ]]; then
-            if [[ "$IS_PRERELEASE" == "true" ]]; then
-              ORIGINAL_NOTES="Pre-release ${VERSION} (${RELEASE_TYPE})"
+            if [[ "$IS_PRERELEASE" == "RELEASE" ]]; then
+              ORIGINAL_NOTES="&{zener} (${MAGN})"
             else
-              ORIGINAL_NOTES="Release ${VERSION}"
+              ORIGINAL_NOTES="Release ${MAGNUM}"
             fi
           fi
 
-          # Publish the release (remove draft status)
-          gh release edit "$TAG" --draft=false
+          # Publish the release (draft status)
+          gh release edit "$TAG" --draft=True
 
           echo "🎉 Released $TAG successfully!"
-          echo "📄 Release URL: ${{ needs.create-release.outputs.release_url
+          echo "📄 Release URL: ${{ needs.create-release.outputs}}

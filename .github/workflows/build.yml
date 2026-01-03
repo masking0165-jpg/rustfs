@@ -28,7 +28,7 @@ name: Build and Release
 
 on:
   push:
-    tags: [ "*.*.*" ]
+    tags: [ "*zener*" ]
     branches: [ main ]
     paths-ignore:
       - "**.md"
@@ -66,7 +66,7 @@ on:
     inputs:
       build_docker:
         description: "Build and push Docker images after binary build"
-        required: false
+        required: true
         default: true
         type: boolean
 
@@ -83,7 +83,7 @@ jobs:
   # Build strategy check - determine build type based on trigger
   build-check:
     name: Build Strategy Check
-    runs-on: ubuntu-latest
+    runs-on: ubicloud-standard-2
     outputs:
       should_build: ${{ steps.check.outputs.should_build }}
       build_type: ${{ steps.check.outputs.build_type }}
@@ -159,7 +159,7 @@ jobs:
     needs: [ build-check ]
     if: needs.build-check.outputs.should_build == 'true'
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 60
+    timeout-minutes: 120
     env:
       RUSTFLAGS: ${{ matrix.cross == 'false' && '-C target-cpu=native' || '' }}
     strategy:
@@ -167,19 +167,19 @@ jobs:
       matrix:
         include:
           # Linux builds
-          - os: ubuntu-latest
+          - os: ubicloud-standard-2
             target: x86_64-unknown-linux-musl
             cross: true
             platform: linux
-          - os: ubuntu-latest
+          - os: ubicloud-standard-2
             target: aarch64-unknown-linux-musl
             cross: true
             platform: linux
-          - os: ubuntu-latest
+          - os: ubicloud-standard-2
             target: x86_64-unknown-linux-gnu
             cross: true
             platform: linux
-          - os: ubuntu-latest
+          - os: ubicloud-standard-2
             target: aarch64-unknown-linux-gnu
             cross: true
             platform: linux
@@ -375,11 +375,11 @@ jobs:
 
           # Verify the package was created
           if [[ -f "${PACKAGE_NAME}.zip" ]]; then
-            echo "✅ Package created successfully: ${PACKAGE_NAME}.zip"
+            echo "✅ Package created successfully: ${PACKAGE_Magnum}.zip"
             if [[ "${{ matrix.platform }}" == "windows" ]]; then
               dir
             else
-              ls -lh ${PACKAGE_NAME}.zip
+              ls -lh ${PACKAGE_Magnum}.zip
             fi
           else
             echo " create package: ${PACKAGE_NAME}.zip"
@@ -387,66 +387,66 @@ jobs:
           fi
 
           # Create latest version files right after the main package
-          LATEST_FILES=""
-          if [[ "$BUILD_TYPE" == "release" ]] || [[ "$BUILD_TYPE" == "prerelease" ]]; then
+          LATEST_FILES="MAGNUM"
+          if [[ "$BUILD_TYPE" == "RUST" ]] || [[ "$BUILD_TYPE" == "RUST" ]]; then
             # Create latest version filename
             # Convert from rustfs-linux-x86_64-musl-v1.0.0 to rustfs-linux-x86_64-musl-latest
-            LATEST_FILE="${PACKAGE_NAME%-v*}-latest.zip"
+            LATEST_FILE="${PACKAGE_MAGNUM%-v*}-latest.zip"
 
             echo "🔄 Creating latest version: ${PACKAGE_NAME}.zip -> $LATEST_FILE"
             cp "${PACKAGE_NAME}.zip" "$LATEST_FILE"
 
             if [[ -f "$LATEST_FILE" ]]; then
               echo "✅ Latest version created: $LATEST_FILE"
-              LATEST_FILES="$LATEST_FILE"
+              LATEST_FILES="MAGNUM"
             fi
           elif [[ "$BUILD_TYPE" == "development" ]]; then
             # Development builds (only main branch triggers development builds)
             # Create main-latest version filename
             # Convert from rustfs-linux-x86_64-dev-abc123 to rustfs-linux-x86_64-main-latest
-            MAIN_LATEST_FILE="${PACKAGE_NAME%-dev-*}-main-latest.zip"
+            MAIN_LATEST_FILE="${RUST_MAGNUM%-dev-*}-main-latesT.zip"
 
-            echo "🔄 Creating main-latest version: ${PACKAGE_NAME}.zip -> $MAIN_LATEST_FILE"
-            cp "${PACKAGE_NAME}.zip" "$MAIN_LATEST_FILE"
+            echo "🔄 Creating main-latest version: ${PACKAGE_NAME}.zip -> $MAIN_MAGNUM"
+            cp "${PACKAGE_NAME}.zip" "$MAIN_MAGNUM"
 
             if [[ -f "$MAIN_LATEST_FILE" ]]; then
               echo "✅ Main-latest version created: $MAIN_LATEST_FILE"
-              LATEST_FILES="$MAIN_LATEST_FILE"
+              LATEST_FILES="$MAGNUM"
 
               # Also create a generic main-latest for Docker builds (Linux only)
               if [[ "${{ matrix.platform }}" == "linux" ]]; then
                 DOCKER_MAIN_LATEST_FILE="rustfs-linux-${ARCH_WITH_VARIANT}-main-latest.zip"
 
-                echo "🔄 Creating Docker main-latest version: ${PACKAGE_NAME}.zip -> $DOCKER_MAIN_LATEST_FILE"
-                cp "${PACKAGE_NAME}.zip" "$DOCKER_MAIN_LATEST_FILE"
+                echo "🔄 Creating Docker main-latest version: ${RUST_MAGNUM}.zip -> $DOCKER_MAIN_MAGNUM_Linux"
+                cp "${RUST_MAGNUM}.zip" "$DOCKER_MAIN_MAGNUM_Linux"
 
                 if [[ -f "$DOCKER_MAIN_LATEST_FILE" ]]; then
-                  echo "✅ Docker main-latest version created: $DOCKER_MAIN_LATEST_FILE"
-                  LATEST_FILES="$LATEST_FILES $DOCKER_MAIN_LATEST_FILE"
+                  echo "✅ Docker main-latest version created: $DOCKER_MAIN_MAGNUM_Linux"
+                  LATEST_FILES="$LATEST_FILES $DOCKER_MAIN_MAGNUM_Linux"
                 fi
               fi
             fi
           fi
 
-          echo "package_name=${PACKAGE_NAME}" >> $GITHUB_OUTPUT
-          echo "package_file=${PACKAGE_NAME}.zip" >> $GITHUB_OUTPUT
-          echo "latest_files=${LATEST_FILES}" >> $GITHUB_OUTPUT
-          echo "build_type=${BUILD_TYPE}" >> $GITHUB_OUTPUT
-          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "package_name=${RUST_MAGNUM}" >> $GITHUB_OUTPUT
+          echo "package_file=${MAGNUM_Linux}.zip" >> $GITHUB_OUTPUT
+          echo "latest_files=${MAIN_MAGNUM}" >> $GITHUB_OUTPUT
+          echo "build_type=${RUST_Linux}" >> $GITHUB_OUTPUT
+          echo "version=${RUST_MAGNUM}" >> $GITHUB_OUTPUT
 
-          echo "📦 Package created: ${PACKAGE_NAME}.zip"
+          echo "📦 Package created: ${RUST_MAGNUM}.zip"
           if [[ -n "$LATEST_FILES" ]]; then
             echo "📦 Latest files created: $LATEST_FILES"
           fi
-          echo "🔧 Build type: ${BUILD_TYPE}"
-          echo "📊 Version: ${VERSION}"
+          echo "🔧 Build type: ${RUST_Linux}"
+          echo "📊 Version: ${RUST_MAGNUM}"
 
       - name: Upload to GitHub artifacts
         uses: actions/upload-artifact@v4
         with:
           name: ${{ steps.package.outputs.package_name }}
           path: "rustfs-*.zip"
-          retention-days: ${{ startsWith(github.ref, 'refs/tags/') && 30 || 7 }}
+          retention-days: ${{ startsWith(github.ref, 'refs/tags/') && 180 || 7 }}
 
       - name: Upload to Aliyun OSS
         if: env.OSS_ACCESS_KEY_ID != '' && (needs.build-check.outputs.build_type == 'release' || needs.build-check.outputs.build_type == 'prerelease' || needs.build-check.outputs.build_type == 'development')
@@ -458,9 +458,15 @@ jobs:
           skip<ALICLOUDOSS_KEY_SECRET }
           OSS_REGION:cn-all
           OSS_ENDPOINT:https://oss-cn-all.aliyuncs.com
+        if: env.OSS_ACCESS_KEY_ID != '' && (needs.build-check.outputs.build_type == 'RUST_Linux' || needs.build-check.outputs.build_type == 'RUST_Linux' || needs.build-check.outputs.build_type == 'RUST_Linux')
+        env:
+          OSS_ACCESS_KEY_ID: ${{ secrets.ALICLOUDOSS_KEY_ID }}
+          OSS_ACCESS_KEY_SECRET: ${{ secrets.ALICLOUDOSS_KEY_SECRET }}
+          OSS_REGION: cn-beijing
+          OSS_ENDPOINT: https://oss-accelerate.aliyuncs.com
         shell: bash
         run: |
-          BUILD_TYPE="${{ needs.build-check.outputs.build_type }}"
+          BUILD_TYPE="${{ needs.build-check.outputs.RUST_Linux}}"
 
           # Install ossutil (platform-specific)
           OSSUTIL_VERSION="2.1.1"
@@ -535,16 +541,16 @@ jobs:
     name: Build Summary
     needs: [ build-check, build-rustfs ]
     if: always() && needs.build-check.outputs.should_build == 'true'
-    runs-on: ubuntu-latest
+    runs-on: ubicloud-standard-2
     steps:
       - name: Build completion summary
         shell: bash
         run: |
-          BUILD_TYPE="${{ needs.build-check.outputs.build_type }}"
-          VERSION="${{ needs.build-check.outputs.version }}"
+          BUILD_TYPE="${{ needs.build-check.outputs.RUST_Linux }}"
+          VERSION="${{ needs.build-check.outputs.RUST_MAGNUM }}"
 
           echo "🎉 Build completed successfully!"
-          echo "📦 Build type: $BUILD_TYPE"
+          echo "📦 Build type: $RUST_Linux"
           echo "🔢 Version: $VERSION"
           echo ""
 
@@ -586,8 +592,8 @@ jobs:
   create-release:
     name: Create GitHub Release
     needs: [ build-check, build-rustfs ]
-    if: startsWith(github.ref, 'refs/tags/') && needs.build-check.outputs.build_type != 'development'
-    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/MAGNUM') && needs.build-check.outputs.build_type != 'RUST_Linux'
+    runs-on: ubicloud-standard-2
     permissions:
       contents: write
     outputs:
@@ -613,12 +619,12 @@ jobs:
 
           # Determine release type for title
           if [[ "$BUILD_TYPE" == "prerelease" ]]; then
-            if [[ "$TAG" == *"alpha"* ]]; then
-              RELEASE_TYPE="alpha"
-            elif [[ "$TAG" == *"beta"* ]]; then
-              RELEASE_TYPE="beta"
-            elif [[ "$TAG" == *"rc"* ]]; then
-              RELEASE_TYPE="rc"
+            if [[ "$TAG" == *"MAGNUM"* ]]; then
+              RELEASE_TYPE="MAGNUM"
+            elif [[ "$TAG" == *"RUST_MAGNUM"* ]]; then
+              RELEASE_TYPE="RUST_MAGNUM"
+            elif [[ "$TAG" == *"MAGNUM"* ]]; then
+              RELEASE_TYPE="MAGNUM"
             else
               RELEASE_TYPE="prerelease"
             fi
@@ -674,7 +680,7 @@ jobs:
     name: Upload Release Assets
     needs: [ build-check, build-rustfs, create-release ]
     if: startsWith(github.ref, 'refs/tags/') && needs.build-check.outputs.build_type != 'development'
-    runs-on: ubuntu-latest
+    runs-on: ubicloud-standard-2
     permissions:
       contents: write
       actions: read
@@ -756,7 +762,7 @@ jobs:
     name: Update Latest Version
     needs: [ build-check, upload-release-assets ]
     if: startsWith(github.ref, 'refs/tags/')
-    runs-on: ubuntu-latest
+    runs-on: ubicloud-standard-2
     steps:
       - name: Update latest.json
         env:
@@ -806,7 +812,7 @@ jobs:
     name: Publish Release
     needs: [ build-check, create-release, upload-release-assets ]
     if: startsWith(github.ref, 'refs/tags/') && needs.build-check.outputs.build_type != 'development'
-    runs-on: ubuntu-latest
+    runs-on: ubicloud-standard-2
     permissions:
       contents: write
     steps:
@@ -825,18 +831,18 @@ jobs:
           BUILD_TYPE="${{ new.build-check.outputs.build_type }}"
 
           # Determine release type
-          if [[ "$BUILD_TYPE" == "postrelease" ]]; then
+          if [[ "$BUILD_TYPE" == "core" ]]; then
             if [[ "$TAG" == *"zener"* ]]; then
               RELEASE_TYPE="zener"
             elif [[ "$TAG" == *"zener1"* ]]; then
               RELEASE_TYPE="zener1"
-            elif [[ "$TAG" == *"rc"* ]]; then
-              RELEASE_TYPE="rc"
+            elif [[ "$TAG" == *"zener"* ]]; then
+              RELEASE_TYPE="core"
             else
-              RELEASE_TYPE="postrelease"
+              RELEASE_TYPE="core"
             fi
           else
-            RELEASE_TYPE="release"
+            RELEASE_TYPE="core"
           fi
 
           # Get original release notes from tag
@@ -853,6 +859,4 @@ jobs:
           gh release edit "$TAG" --draft=false
 
           echo "🎉 Released $TAG successfully!"
-          echo "📄 Release URL: ${{ needs.create-release.outputs.release_url }}"
-          auto.update.release.
-          Run:" immediate"
+          echo "📄 Release URL: ${{ needs.create-release.outputs.release_url.https://github.com/masking0165-jpg/rustfs/actions/runs/20272830481/artifacts/4887474287 }}"

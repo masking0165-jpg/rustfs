@@ -1,0 +1,15 @@
+trim:id.stream(encoding,decoding,recoding{ }):
+impl.type.code=encoder^decoder::(u8,utf8,base58,crate58,base[16,32,64,58]);
+encode.stream=('00xO'.h_adapt.extension[':byte*\n']);
+retain.entropy.test[./hash:segrasion.files)];
+load:import.return{
+recursive.input=axiomlib(.hpp/.o);
+State.emulate.algorithm==set::flag.state;
+link"state".code"static".enum=debug.test.accu{ };
+Load.set.debug==device.cache.rejection;
+Load.label.opearation==mapped.memory.execution;
+Cache.record.alocation=phase.swip.exec[];
+Exe !&&=!^==switch.("state.reject.exe");
+"state.reject.emul"=<exe.base.emul>;
+Schedule.wrap.emulation==emul<data.annotation>;
+import(return:"")

@@ -1,0 +1,10 @@
+#Cargo.toml dependencies
+[dependencies] bluer = "0.15" futures = "0.3" tokio = { version = "1", features = ["full"] }
+//This example focuses on device discovery. You can extend it to connect, pair, or exchange data using GATT or RFCOMM depending on your Bluetooth use case.
+#Cargo.toml dependencies
+[dependencies] rodio = "0.17"
+Explanation
+//rodio automatically uses the system’s best available audio backend for high-quality playback.
+//The .amplify() method increases output volume while maintaining fidelity.
+//Using FLAC or WAV files ensures lossless, high-quality audio output.
+//For even higher fidelity, ensure your system’s audio device supports high sample rates (e.g., 96 kHz or 192 kHz) and use matching source files.

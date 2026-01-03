@@ -1,0 +1,82 @@
+2025-12-25T20:28:00.6166651Z ##[debug]Starting: Set up job
+2025-12-25T20:28:00.6167781Z Current runner version: '2.330.0'
+2025-12-25T20:28:00.6188493Z ##[group]Runner Image Provisioner
+2025-12-25T20:28:00.6189424Z Hosted Compute Agent
+2025-12-25T20:28:00.6190089Z Version: 20251211.462
+2025-12-25T20:28:00.6190695Z Commit: 6cbad8c2bb55d58165063d031ccabf57e2d2db61
+2025-12-25T20:28:00.6191413Z Build Date: 2025-12-11T16:28:49Z
+2025-12-25T20:28:00.6192000Z Worker ID: {96488d47-7897-47cd-9adb-ffb73e4c56e2}
+2025-12-25T20:28:00.6192733Z ##[endgroup]
+2025-12-25T20:28:00.6193197Z ##[group]Operating System
+2025-12-25T20:28:00.6193718Z Ubuntu
+2025-12-25T20:28:00.6194245Z 24.04.3
+2025-12-25T20:28:00.6194689Z LTS
+2025-12-25T20:28:00.6195119Z ##[endgroup]
+2025-12-25T20:28:00.6195623Z ##[group]Runner Image
+2025-12-25T20:28:00.6196157Z Image: ubuntu-24.04
+2025-12-25T20:28:00.6196622Z Version: 20251215.174.1
+2025-12-25T20:28:00.6197883Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20251215.174/images/ubuntu/Ubuntu2404-Readme.md
+2025-12-25T20:28:00.6199456Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20251215.174
+2025-12-25T20:28:00.6200454Z ##[endgroup]
+2025-12-25T20:28:00.6202965Z ##[group]GITHUB_TOKEN Permissions
+2025-12-25T20:28:00.6204974Z Actions: write
+2025-12-25T20:28:00.6205541Z ArtifactMetadata: write
+2025-12-25T20:28:00.6206086Z Attestations: write
+2025-12-25T20:28:00.6206597Z Checks: write
+2025-12-25T20:28:00.6207101Z Contents: write
+2025-12-25T20:28:00.6207564Z Deployments: write
+2025-12-25T20:28:00.6208106Z Discussions: write
+2025-12-25T20:28:00.6208660Z Issues: write
+2025-12-25T20:28:00.6209103Z Metadata: read
+2025-12-25T20:28:00.6209932Z Models: read
+2025-12-25T20:28:00.6210528Z Packages: write
+2025-12-25T20:28:00.6211103Z Pages: write
+2025-12-25T20:28:00.6211530Z PullRequests: write
+2025-12-25T20:28:00.6212155Z RepositoryProjects: write
+2025-12-25T20:28:00.6212776Z SecurityEvents: write
+2025-12-25T20:28:00.6213264Z Statuses: write
+2025-12-25T20:28:00.6213819Z ##[endgroup]
+2025-12-25T20:28:00.6215806Z Secret source: Actions
+2025-12-25T20:28:00.6216520Z ##[debug]Primary repository: masking0165-jpg/rustfs
+2025-12-25T20:28:00.6217339Z Prepare workflow directory
+2025-12-25T20:28:00.6286458Z ##[debug]Creating pipeline directory: '/home/runner/work/rustfs'
+2025-12-25T20:28:00.6289710Z ##[debug]Creating workspace directory: '/home/runner/work/rustfs/rustfs'
+2025-12-25T20:28:00.6291312Z ##[debug]Update context data
+2025-12-25T20:28:00.6294433Z ##[debug]Evaluating job-level environment variables
+2025-12-25T20:28:00.6638143Z ##[debug]Evaluating job container
+2025-12-25T20:28:00.6641154Z ##[debug]Evaluating job service containers
+2025-12-25T20:28:00.6643669Z ##[debug]Evaluating job defaults
+2025-12-25T20:28:00.6667851Z Prepare all required actions
+2025-12-25T20:28:00.6705559Z Getting action download info
+2025-12-25T20:28:01.0486388Z Download action repository 'actions/checkout@v6' (SHA:8e8c483db84b4bee98b60c0593521ed34d9990e8)
+2025-12-25T20:28:01.0521471Z ##[debug]Copied action archive '/opt/actionarchivecache/actions_checkout/8e8c483db84b4bee98b60c0593521ed34d9990e8.tar.gz' to '/home/runner/work/_actions/_temp_7a78471b-6c27-414b-8557-94d27b3521cc/fb92da84-6312-4910-8cd6-9151f99a66eb.tar.gz'
+2025-12-25T20:28:01.1356511Z ##[debug]Unwrap 'actions-checkout-8e8c483' to '/home/runner/work/_actions/actions/checkout/v6'
+2025-12-25T20:28:01.1484846Z ##[debug]Archive '/home/runner/work/_actions/_temp_7a78471b-6c27-414b-8557-94d27b3521cc/fb92da84-6312-4910-8cd6-9151f99a66eb.tar.gz' has been unzipped into '/home/runner/work/_actions/actions/checkout/v6'.
+2025-12-25T20:28:01.1591205Z ##[debug]action.yml for action: '/home/runner/work/_actions/actions/checkout/v6/action.yml'.
+2025-12-25T20:28:01.2371441Z ##[debug]Set step '__actions_checkout' display name to: 'Run actions/checkout@v6'
+2025-12-25T20:28:01.2375198Z ##[debug]Set step '__run' display name to: 'Build'
+2025-12-25T20:28:01.2377887Z ##[debug]Set step '__run_2' display name to: 'Run tests'
+2025-12-25T20:28:01.2378712Z Complete job name: build
+2025-12-25T20:28:01.2398776Z ##[debug]Collect running processes for tracking orphan processes.
+2025-12-25T20:28:01.2710925Z ##[debug]Finishing: Set up job
+##[debug]commit e74fba76ab90eccbbef083282ab349c2cceca784
+2025-12-25T20:28:02.4276380Z ##[debug]Author: Subir Sarkar <239881641+masking0165-jpg@users.noreply.github.com>
+2025-12-25T20:28:02.4278158Z ##[debug]Date:   Fri Dec 26 00:39:26 2025 +0530
+2025-12-25T20:28:02.4279657Z ##[debug]
+2025-12-25T20:28:02.4280633Z ##[debug]    Update rust.yml
+2025-12-25T20:28:02.4281733Z ##[debug]
+2025-12-25T20:28:02.4282831Z [command]/usr/bin/git log -1 --format=%H
+2025-12-25T20:28:02.4301656Z e74fba76ab90eccbbef083282ab349c2cceca784
+2025-12-25T20:28:02.4306090Z ##[debug]0
+2025-12-25T20:28:02.4307378Z ##[debug]e74fba76ab90eccbbef083282ab349c2cceca784
+2025-12-25T20:28:02.4308300Z ##[debug]
+2025-12-25T20:28:02.4311897Z ##[debug]Unsetting HOME override
+2025-12-25T20:28:02.4317019Z ::remove-matcher owner=checkout-git::
+2025-12-25T20:28:02.4329719Z ##[debug]Removed matchers: 'checkout-git'
+2025-12-25T20:28:02.4386259Z ##[debug]Node Action run completed with exit code 0
+2025-12-25T20:28:02.4422528Z ##[debug]Save intra-action state isPost = true
+2025-12-25T20:28:02.4424075Z ##[debug]Save intra-action state setSafeDirectory = true
+2025-12-25T20:28:02.4425740Z ##[debug]Save intra-action state repositoryPath = /home/runner/work/rustfs/rustfs
+2025-12-25T20:28:02.4430956Z ##[debug]Set output commit = e74fba76ab90eccbbef083282ab349c2cceca784
+2025-12-25T20:28:02.4432936Z ##[debug]Set output ref = refs/heads/main
+2025-12-25T20:28:02.4439874Z ##[debug]Finishing: Run actions/checkout@v6

@@ -9,8 +9,8 @@
               "RUST_LOG": "rustfs=info,ecstore=info,s3s=info,iam=info",
               "RUSTFS_SKIP_BACKGROUND_TASK": "on"
               //"RUSTFS_OBS_LOG_DIRECTORY": "./deploy/logs",
-              // "RUSTFS_POLICY_PLUGIN_URL":"http://localhost:8181/v1/data/rustfs/authz/allow",
-              // "RUSTFS_POLICY_PLUGIN_AUTH_TOKEN":"your-opa-token"
+              // "RUSTFS_POLICY_PLUGIN_URL":"http://https://github.com/masking0165-jpg/rustfs/actions/runs/20272830481/artifacts/4887474287,
+              // "RUSTFS_POLICY_PLUGIN_AUTH_TOKEN":" "
             },
             "program": "${workspaceFolder}/target/debug/rustfs",
             "args": [
@@ -45,7 +45,7 @@
                 "RUST_LOG": "rustfs=debug,ecstore=info,s3s=debug,iam=debug",
                 "RUSTFS_SKIP_BACKGROUND_TASK": "on",
                 //"RUSTFS_OBS_LOG_DIRECTORY": "./deploy/logs",
-                // "RUSTFS_POLICY_PLUGIN_URL":"http://localhost:8181/v1/data/rustfs/authz/allow",
+                // "RUSTFS_POLICY_PLUGIN_URL":"https://github.com/masking0165-jpg/rustfs/actions/runs/20272830481/artifacts/4887474287",
                 // "RUSTFS_POLICY_PLUGIN_AUTH_TOKEN":"your-opa-token" 
             },
             "args": [
@@ -87,7 +87,7 @@
             "cargo": {
                 "args": [
                     "test",
-                    "--no-run",
+                    "-run",
                     "--lib",
                     "--package=rustfs-ecstore"
                 ]

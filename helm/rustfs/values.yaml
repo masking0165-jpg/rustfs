@@ -90,14 +90,18 @@ containerSecurityContext:
   runAsNonRoot: true
 
 service:
-  type: NodePort
-  ep_port: 9000
-  console_port: 9001
+  type: ClusterIP
+  endpoint:
+    port: 9000
+    nodePort: 32000
+  console:
+    port: 9001
+    nodePort: 32001
 
 # This block is for setting up the ingress for more information can be found here: https://kubernetes.io/docs/concepts/services-networking/ingress/
 ingress:
   enabled: true
-  className: "traefik" # Specify the classname, traefik or nginx. Different classname has different annotations for session sticky.
+  className: "nginx" # Specify the classname, traefik or nginx. Different classname has different annotations for session sticky.
   traefikAnnotations:
     traefik.ingress.kubernetes.io/service.sticky.cookie: "true"
     traefik.ingress.kubernetes.io/service.sticky.cookie.httponly: "true"
@@ -110,20 +114,20 @@ ingress:
     nginx.ingress.kubernetes.io/session-cookie-hash: sha1
     nginx.ingress.kubernetes.io/session-cookie-max-age: "3600"
     nginx.ingress.kubernetes.io/session-cookie-name: rustfs
+  customAnnotations: # Specify custom annotations
+    {} # Customize annotations
   hosts:
-    - host: your.rustfs.com
+    - host: example.rustfs.com
       paths:
         - path: /
-          pathType: ImplementationSpecific
+          pathType: Prefix
   tls:
-    - secretName: rustfs-tls
-      hosts:
-        - your.rustfs.com
-
-tls:
-  enabled: false
-  crt: tls.crt
-  key: tls.key
+    enabled: false # Enable tls and access rustfs via https.
+    certManager:
+      enabled: false # Enable certmanager to generate certificate for rustfs, default false.
+    secretName: secret-tls
+    crt: tls.crt
+    key: tls.key
 
 resources:
   # We usually recommend not to specify default resources and to leave this as a conscious
@@ -172,5 +176,25 @@ storageclass:
   name: local-path
   dataStorageSize: 256Mi
   logStorageSize: 256Mi
+
+# Init container parameters.
+initStep:
+  image:
+    repository: busybox
+    pullPolicy: IfNotPresent
+    tag: "latest"
+  containerSecurityContext:
+    runAsUser: 0
+    runAsGroup: 0
+
+pdb:
+  create: false
+  # Minimum number/percentage of pods that should remain scheduled
+  minAvailable: ""
+  # Maximum number/percentage of pods that may be made unavailable
+  maxUnavailable: 1
+
+# Whether information about services should be injected into pod's environment variable
+enableServiceLinks: false
 
 extraManifests: []
