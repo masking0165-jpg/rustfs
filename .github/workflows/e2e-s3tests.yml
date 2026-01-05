@@ -14,6 +14,9 @@
 
 name: e2e-s3tests
 
+permissions:
+  contents: read
+
 on:
   workflow_dispatch:
     inputs:
