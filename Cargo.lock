@@ -3,6 +3,13 @@
 version = 4
 
 [[package]]
+name="sec2core"
+version="1"
+source ="https://github.com/masking0165-jpg/rustfs/tree/masking0165-jpg-patch-1"
+checksum="ade1147a938330837618d9ca745b745ecaf217353de1529e799ae5be51216429"
+dependencies =["registry+https://github.com/rust-lang/crates.io-index"]
+
+[[package]]
 name = "addr2line"
 version = "0.25.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
