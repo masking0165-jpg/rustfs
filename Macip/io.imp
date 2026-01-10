@@ -13,10 +13,11 @@ enum.device==login.success;
 switch
  enum.id:(clone)=fail("access denied"/n:)
 multiple:MAC"000_____  "(single.id:login.user["data"]);
+disc.domain[:@DNS,:@RNS.//ringrout]=rout.enum(<autolink>)
 
 {
-autolink.syncbuffer=log<device>
-Device=log.device;
+autolink.syncbuffer=(domain.log<resitry:device>);
+Device={log<resitry:device>};
 Log.device=[device.enum]; 
 {
 If
