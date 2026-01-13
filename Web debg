@@ -1,0 +1,535 @@
+<!doctype html>
+<html lang="en" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Web Debugger</title>
+  <script src="/_sdk/element_sdk.js"></script>
+  <style>
+    body {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      color: #e0e0e0;
+      height: 100%;
+      overflow: auto;
+    }
+
+    .debugger-container {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 32px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .main-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .panel {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      backdrop-filter: blur(10px);
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid rgba(102, 126, 234, 0.3);
+    }
+
+    .panel-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #667eea;
+    }
+
+    .tab-group {
+      display: flex;
+      gap: 10px;
+    }
+
+    .tab {
+      padding: 6px 14px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #e0e0e0;
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 0.3s;
+    }
+
+    .tab:hover {
+      background: rgba(102, 126, 234, 0.2);
+      border-color: #667eea;
+    }
+
+    .tab.active {
+      background: #667eea;
+      border-color: #667eea;
+      color: white;
+    }
+
+    .code-input {
+      width: 100%;
+      flex: 1;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 15px;
+      color: #e0e0e0;
+      font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+      font-size: 14px;
+      resize: none;
+      outline: none;
+    }
+
+    .code-input:focus {
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .button-group {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border-radius: 8px;
+      border: none;
+      font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.1);
+      color: #e0e0e0;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .output-area {
+      flex: 1;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 15px;
+      overflow-y: auto;
+      font-size: 13px;
+      min-height: 0;
+    }
+
+    .console-line {
+      padding: 8px;
+      margin-bottom: 4px;
+      border-radius: 4px;
+      border-left: 3px solid transparent;
+      font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    }
+
+    .console-log {
+      border-left-color: #4a9eff;
+      background: rgba(74, 158, 255, 0.1);
+    }
+
+    .console-error {
+      border-left-color: #ff4757;
+      background: rgba(255, 71, 87, 0.1);
+      color: #ff6b81;
+    }
+
+    .console-warn {
+      border-left-color: #ffa502;
+      background: rgba(255, 165, 2, 0.1);
+      color: #ffc048;
+    }
+
+    .console-info {
+      border-left-color: #667eea;
+      background: rgba(102, 126, 234, 0.1);
+      color: #a8b3ff;
+    }
+
+    .css-rule {
+      margin-bottom: 15px;
+      padding: 12px;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 6px;
+      border-left: 3px solid #667eea;
+    }
+
+    .css-selector {
+      color: #ffa502;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .css-property {
+      padding-left: 20px;
+      margin: 4px 0;
+    }
+
+    .css-property-name {
+      color: #4a9eff;
+    }
+
+    .css-property-value {
+      color: #2ed573;
+    }
+
+    .code-preview {
+      flex: 1;
+      background: white;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      overflow: auto;
+    }
+
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: rgba(255, 255, 255, 0.3);
+      font-size: 14px;
+    }
+
+    .empty-state-icon {
+      font-size: 48px;
+      margin-bottom: 10px;
+    }
+
+    @media (max-width: 968px) {
+      .main-content {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+  <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
+ </head>
+ <body>
+  <div class="debugger-container">
+   <header>
+    <h1 id="app-title">🔧 Web Debugger</h1>
+   </header>
+   <main class="main-content"><!-- Left Panel: Code Input -->
+    <div class="panel">
+     <div class="panel-header"><span class="panel-title">Code Editor</span>
+      <div class="tab-group"><button class="tab active" data-lang="html">HTML</button> <button class="tab" data-lang="css">CSS</button> <button class="tab" data-lang="js">JavaScript</button>
+      </div>
+     </div><textarea id="code-input" class="code-input" placeholder="Enter your HTML, CSS, or JavaScript code here..."></textarea>
+     <div class="button-group"><button class="btn btn-primary" id="run-btn">▶ Run Code</button> <button class="btn btn-secondary" id="clear-btn">✕ Clear</button>
+     </div>
+    </div><!-- Right Panel: Output -->
+    <div class="panel">
+     <div class="panel-header"><span class="panel-title">Output</span>
+      <div class="tab-group"><button class="tab active" data-output="console">Console</button> <button class="tab" data-output="css">CSS Debug</button> <button class="tab" data-output="preview">Preview</button>
+      </div>
+     </div>
+     <div id="output-console" class="output-area">
+      <div class="empty-state">
+       <div class="empty-state-icon">
+        📋
+       </div>
+       <div>
+        Run your code to see console output
+       </div>
+      </div>
+     </div>
+     <div id="output-css" class="output-area" style="display: none;">
+      <div class="empty-state">
+       <div class="empty-state-icon">
+        🎨
+       </div>
+       <div>
+        CSS rules will appear here
+       </div>
+      </div>
+     </div>
+     <div id="output-preview" class="code-preview" style="display: none;">
+      <div class="empty-state">
+       <div class="empty-state-icon">
+        👁️
+       </div>
+       <div>
+        HTML preview will render here
+       </div>
+      </div>
+     </div>
+    </div>
+   </main>
+  </div>
+  <script>
+    const defaultConfig = {
+      app_title: '🔧 Web Debugger',
+      placeholder_text: 'Enter your HTML, CSS, or JavaScript code here...'
+    };
+
+    let currentLang = 'html';
+    let currentOutput = 'console';
+    const consoleLogs = [];
+
+    // SDK Implementation
+    const element = {
+      defaultConfig,
+      onConfigChange: async (config) => {
+        const title = config.app_title || defaultConfig.app_title;
+        const placeholder = config.placeholder_text || defaultConfig.placeholder_text;
+        
+        document.getElementById('app-title').textContent = title;
+        document.getElementById('code-input').placeholder = placeholder;
+      },
+      mapToCapabilities: (config) => ({
+        recolorables: [],
+        borderables: [],
+        fontEditable: undefined,
+        fontSizeable: undefined
+      }),
+      mapToEditPanelValues: (config) => new Map([
+        ['app_title', config.app_title || defaultConfig.app_title],
+        ['placeholder_text', config.placeholder_text || defaultConfig.placeholder_text]
+      ])
+    };
+
+    if (window.elementSdk) {
+      window.elementSdk.init(element);
+    }
+
+    // Language tabs
+    document.querySelectorAll('.tab[data-lang]').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab[data-lang]').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        currentLang = tab.dataset.lang;
+        updatePlaceholder();
+      });
+    });
+
+    // Output tabs
+    document.querySelectorAll('.tab[data-output]').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab[data-output]').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        currentOutput = tab.dataset.output;
+        
+        document.getElementById('output-console').style.display = currentOutput === 'console' ? 'block' : 'none';
+        document.getElementById('output-css').style.display = currentOutput === 'css' ? 'block' : 'none';
+        document.getElementById('output-preview').style.display = currentOutput === 'preview' ? 'block' : 'none';
+      });
+    });
+
+    function updatePlaceholder() {
+      const config = window.elementSdk ? window.elementSdk.config : defaultConfig;
+      const placeholders = {
+        html: 'Enter HTML code here... e.g., <div>Hello World</div>',
+        css: 'Enter CSS code here... e.g., .class { color: red; }',
+        js: 'Enter JavaScript code here... e.g., console.log("Hello");'
+      };
+      document.getElementById('code-input').placeholder = placeholders[currentLang];
+    }
+
+    // Custom console capture
+    function addConsoleLog(message, type = 'log') {
+      const logLine = document.createElement('div');
+      logLine.className = `console-line console-${type}`;
+      logLine.textContent = `[${type.toUpperCase()}] ${message}`;
+      
+      const consoleOutput = document.getElementById('output-console');
+      if (consoleOutput.querySelector('.empty-state')) {
+        consoleOutput.innerHTML = '';
+      }
+      consoleOutput.appendChild(logLine);
+      consoleOutput.scrollTop = consoleOutput.scrollHeight;
+    }
+
+    // Run code
+    document.getElementById('run-btn').addEventListener('click', () => {
+      const code = document.getElementById('code-input').value.trim();
+      
+      if (!code) {
+        addConsoleLog('No code to execute', 'warn');
+        return;
+      }
+
+      if (currentLang === 'js') {
+        executeJavaScript(code);
+      } else if (currentLang === 'css') {
+        analyzeCss(code);
+      } else if (currentLang === 'html') {
+        renderHtml(code);
+      }
+    });
+
+    function executeJavaScript(code) {
+      const originalConsole = {
+        log: console.log,
+        error: console.error,
+        warn: console.warn,
+        info: console.info
+      };
+
+      // Override console methods
+      console.log = (...args) => addConsoleLog(args.join(' '), 'log');
+      console.error = (...args) => addConsoleLog(args.join(' '), 'error');
+      console.warn = (...args) => addConsoleLog(args.join(' '), 'warn');
+      console.info = (...args) => addConsoleLog(args.join(' '), 'info');
+
+      try {
+        addConsoleLog('Executing JavaScript...', 'info');
+        eval(code);
+        addConsoleLog('✓ Execution completed', 'info');
+      } catch (error) {
+        addConsoleLog(`Error: ${error.message}`, 'error');
+      } finally {
+        // Restore original console
+        Object.assign(console, originalConsole);
+      }
+    }
+
+    function analyzeCss(code) {
+      const cssOutput = document.getElementById('output-css');
+      cssOutput.innerHTML = '';
+      
+      try {
+        const rules = parseCssRules(code);
+        
+        if (rules.length === 0) {
+          cssOutput.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🎨</div><div>No CSS rules found</div></div>';
+          return;
+        }
+
+        rules.forEach(rule => {
+          const ruleDiv = document.createElement('div');
+          ruleDiv.className = 'css-rule';
+          
+          const selector = document.createElement('div');
+          selector.className = 'css-selector';
+          selector.textContent = rule.selector;
+          ruleDiv.appendChild(selector);
+          
+          rule.properties.forEach(prop => {
+            const propDiv = document.createElement('div');
+            propDiv.className = 'css-property';
+            propDiv.innerHTML = `<span class="css-property-name">${prop.name}</span>: <span class="css-property-value">${prop.value}</span>;`;
+            ruleDiv.appendChild(propDiv);
+          });
+          
+          cssOutput.appendChild(ruleDiv);
+        });
+
+        // Switch to CSS tab
+        document.querySelector('.tab[data-output="css"]').click();
+        addConsoleLog(`✓ Analyzed ${rules.length} CSS rule(s)`, 'info');
+      } catch (error) {
+        cssOutput.innerHTML = `<div class="console-line console-error">CSS Parse Error: ${error.message}</div>`;
+      }
+    }
+
+    function parseCssRules(css) {
+      const rules = [];
+      const ruleRegex = /([^{]+)\{([^}]+)\}/g;
+      let match;
+      
+      while ((match = ruleRegex.exec(css)) !== null) {
+        const selector = match[1].trim();
+        const properties = match[2].trim();
+        
+        const props = properties.split(';')
+          .filter(p => p.trim())
+          .map(p => {
+            const [name, value] = p.split(':').map(s => s.trim());
+            return { name, value };
+          });
+        
+        if (props.length > 0) {
+          rules.push({ selector, properties: props });
+        }
+      }
+      
+      return rules;
+    }
+
+    function renderHtml(code) {
+      const previewOutput = document.getElementById('output-preview');
+      previewOutput.innerHTML = code;
+      
+      // Switch to preview tab
+      document.querySelector('.tab[data-output="preview"]').click();
+      addConsoleLog('✓ HTML rendered in preview', 'info');
+    }
+
+    // Clear button
+    document.getElementById('clear-btn').addEventListener('click', () => {
+      document.getElementById('code-input').value = '';
+      document.getElementById('output-console').innerHTML = '<div class="empty-state"><div class="empty-state-icon">📋</div><div>Run your code to see console output</div></div>';
+      document.getElementById('output-css').innerHTML = '<div class="empty-state"><div class="empty-state-icon">🎨</div><div>CSS rules will appear here</div></div>';
+      document.getElementById('output-preview').innerHTML = '<div class="empty-state"><div class="empty-state-icon">👁️</div><div>HTML preview will render here</div></div>';
+      addConsoleLog('Debugger cleared', 'info');
+    });
+
+    // Sample code examples
+    const examples = {
+      html: '<div style="padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 10px;">\n  <h2>Hello Debugger!</h2>\n  <p>This is a sample HTML element.</p>\n</div>',
+      css: '.button {\n  background: #667eea;\n  color: white;\n  padding: 10px 20px;\n  border-radius: 8px;\n  border: none;\n  cursor: pointer;\n}\n\n.button:hover {\n  background: #764ba2;\n  transform: translateY(-2px);\n}',
+      js: 'console.log("Hello from the debugger!");\n\nconst numbers = [1, 2, 3, 4, 5];\nconst sum = numbers.reduce((a, b) => a + b, 0);\nconsole.info("Sum:", sum);\n\nconst squared = numbers.map(n => n * n);\nconsole.log("Squared:", squared);\n\nconsole.warn("This is a warning message");\n\ntry {\n  throw new Error("This is a demo error");\n} catch (e) {\n  console.error(e.message);\n}'
+    };
+
+    addConsoleLog('🔧 Web Debugger ready! Write your code and click Run.', 'info');
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9bd367cb17d140a5',t:'MTc2ODI5MTcwNC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
